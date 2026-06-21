@@ -5,13 +5,13 @@ databases:
     plan: free
     region: oregon
 
-  - name: cinescape-redis
-    type: redis
+services:
+  - type: redis
+    name: cinescape-redis
     plan: free
     region: oregon
     ipAllowList: []
 
-services:
   # ──────────────────────────────────────────────────────────
   # Express API
   # ──────────────────────────────────────────────────────────
