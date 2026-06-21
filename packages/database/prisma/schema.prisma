@@ -1,0 +1,380 @@
+// ============================================================
+// WatchBlitz - Prisma Schema
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// USERS & AUTHENTICATION
+// ============================================================
+
+model User {
+  id          String   @id @default(cuid())
+  clerkId     String   @unique @map("clerk_id")
+  email       String   @unique
+  username    String?  @unique
+  displayName String?  @map("display_name")
+  avatarUrl   String?  @map("avatar_url")
+  role        UserRole @default(USER)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  profile          UserProfile?
+  settings         UserSettings?
+  watchlists       Watchlist[]
+  watchHistory     WatchHistory[]
+  continueWatching ContinueWatching[]
+  favorites        Favorite[]
+  ratings          UserRating[]
+  reviews          UserReview[]
+  searchHistory    SearchHistory[]
+  notifications    Notification[]
+  analyticsEvents  AnalyticsEvent[]
+
+  @@map("users")
+  @@index([clerkId])
+  @@index([email])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+model UserProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique @map("user_id")
+  bio            String?  @db.Text
+  favoriteGenres Int[]    @map("favorite_genres")
+  language       String   @default("en")
+  country        String?
+  timezone       String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UserSettings {
+  id                  String       @id @default(cuid())
+  userId              String       @unique @map("user_id")
+  theme               Theme        @default(DARK)
+  accentColor         String       @default("e50914") @map("accent_color")
+  language            String       @default("en")
+  autoPlay            Boolean      @default(true) @map("auto_play")
+  autoPlayNext        Boolean      @default(true) @map("auto_play_next")
+  defaultQuality      VideoQuality @default(AUTO) @map("default_quality")
+  showSubtitles       Boolean      @default(false) @map("show_subtitles")
+  subtitleLanguage    String       @default("en") @map("subtitle_language")
+  emailNotifications  Boolean      @default(true) @map("email_notifications")
+  pushNotifications   Boolean      @default(true) @map("push_notifications")
+  createdAt           DateTime     @default(now()) @map("created_at")
+  updatedAt           DateTime     @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+enum Theme {
+  DARK
+  LIGHT
+  SYSTEM
+}
+
+enum VideoQuality {
+  AUTO
+  QUALITY_1080P @map("1080p")
+  QUALITY_720P  @map("720p")
+  QUALITY_480P  @map("480p")
+  QUALITY_360P  @map("360p")
+}
+
+// ============================================================
+// WATCHLISTS
+// ============================================================
+
+model Watchlist {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  name          String
+  description   String?  @db.Text
+  isPublic      Boolean  @default(false) @map("is_public")
+  isPinned      Boolean  @default(false) @map("is_pinned")
+  coverImageUrl String?  @map("cover_image_url")
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items WatchlistItem[]
+
+  @@map("watchlists")
+  @@index([userId])
+  @@index([userId, isPinned])
+}
+
+model WatchlistItem {
+  id          String    @id @default(cuid())
+  watchlistId String    @map("watchlist_id")
+  tmdbId      Int       @map("tmdb_id")
+  mediaType   MediaType @map("media_type")
+  addedAt     DateTime  @default(now()) @map("added_at")
+  notes       String?   @db.Text
+  sortOrder   Int       @default(0) @map("sort_order")
+
+  watchlist Watchlist @relation(fields: [watchlistId], references: [id], onDelete: Cascade)
+
+  @@unique([watchlistId, tmdbId, mediaType])
+  @@map("watchlist_items")
+  @@index([watchlistId])
+  @@index([tmdbId, mediaType])
+}
+
+// ============================================================
+// WATCH HISTORY & CONTINUE WATCHING
+// ============================================================
+
+model WatchHistory {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  tmdbId        Int       @map("tmdb_id")
+  mediaType     MediaType @map("media_type")
+  season        Int?
+  episode       Int?
+  currentTime   Float     @default(0) @map("current_time")
+  duration      Float     @default(0)
+  progress      Float     @default(0)
+  completed     Boolean   @default(false)
+  lastWatchedAt DateTime  @default(now()) @map("last_watched_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("watch_history")
+  @@index([userId])
+  @@index([userId, mediaType])
+  @@index([userId, lastWatchedAt(sort: Desc)])
+  @@index([tmdbId, mediaType])
+}
+
+model ContinueWatching {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  tmdbId      Int       @map("tmdb_id")
+  mediaType   MediaType @map("media_type")
+  season      Int?
+  episode     Int?
+  currentTime Float     @default(0) @map("current_time")
+  duration    Float     @default(0)
+  progress    Float     @default(0)
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tmdbId, mediaType])
+  @@map("continue_watching")
+  @@index([userId])
+  @@index([userId, updatedAt(sort: Desc)])
+}
+
+// ============================================================
+// FAVORITES & RATINGS
+// ============================================================
+
+model Favorite {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  tmdbId    Int       @map("tmdb_id")
+  mediaType MediaType @map("media_type")
+  addedAt   DateTime  @default(now()) @map("added_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tmdbId, mediaType])
+  @@map("favorites")
+  @@index([userId])
+  @@index([tmdbId, mediaType])
+}
+
+model UserRating {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  tmdbId    Int       @map("tmdb_id")
+  mediaType MediaType @map("media_type")
+  rating    Float
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tmdbId, mediaType])
+  @@map("user_ratings")
+  @@index([userId])
+  @@index([tmdbId, mediaType])
+}
+
+model UserReview {
+  id               String    @id @default(cuid())
+  userId           String    @map("user_id")
+  tmdbId           Int       @map("tmdb_id")
+  mediaType        MediaType @map("media_type")
+  content          String    @db.Text
+  containsSpoilers Boolean   @default(false) @map("contains_spoilers")
+  isPublic         Boolean   @default(true) @map("is_public")
+  likes            Int       @default(0)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_reviews")
+  @@index([userId])
+  @@index([tmdbId, mediaType])
+  @@index([tmdbId, mediaType, isPublic])
+}
+
+// ============================================================
+// SEARCH HISTORY
+// ============================================================
+
+model SearchHistory {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  query     String
+  resultCount Int    @default(0) @map("result_count")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("search_history")
+  @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  data      Json?
+  isRead    Boolean          @default(false) @map("is_read")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+  @@index([userId])
+  @@index([userId, isRead])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+enum NotificationType {
+  NEW_EPISODE
+  RECOMMENDATION
+  WATCHLIST_UPDATE
+  SYSTEM
+  REVIEW_LIKE
+}
+
+// ============================================================
+// ANALYTICS
+// ============================================================
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  event     String
+  tmdbId    Int?     @map("tmdb_id")
+  mediaType MediaType? @map("media_type")
+  data      Json?
+  sessionId String?  @map("session_id")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("analytics_events")
+  @@index([userId])
+  @@index([event])
+  @@index([tmdbId, mediaType])
+  @@index([createdAt])
+}
+
+// ============================================================
+// TMDB CACHE (Metadata cache layer)
+// ============================================================
+
+model TmdbMovieCache {
+  id          String   @id @default(cuid())
+  tmdbId      Int      @unique @map("tmdb_id")
+  title       String
+  originalTitle String @map("original_title")
+  overview    String?  @db.Text
+  posterPath  String?  @map("poster_path")
+  backdropPath String? @map("backdrop_path")
+  releaseDate String?  @map("release_date")
+  runtime     Int?
+  voteAverage Float    @map("vote_average")
+  voteCount   Int      @map("vote_count")
+  popularity  Float
+  genres      Json     @default("[]")
+  data        Json
+  cachedAt    DateTime @default(now()) @map("cached_at")
+  expiresAt   DateTime @map("expires_at")
+
+  @@map("tmdb_movie_cache")
+  @@index([tmdbId])
+  @@index([expiresAt])
+}
+
+model TmdbTvCache {
+  id               String   @id @default(cuid())
+  tmdbId           Int      @unique @map("tmdb_id")
+  name             String
+  originalName     String   @map("original_name")
+  overview         String?  @db.Text
+  posterPath       String?  @map("poster_path")
+  backdropPath     String?  @map("backdrop_path")
+  firstAirDate     String?  @map("first_air_date")
+  numberOfSeasons  Int      @map("number_of_seasons")
+  numberOfEpisodes Int      @map("number_of_episodes")
+  voteAverage      Float    @map("vote_average")
+  voteCount        Int      @map("vote_count")
+  popularity       Float
+  genres           Json     @default("[]")
+  data             Json
+  cachedAt         DateTime @default(now()) @map("cached_at")
+  expiresAt        DateTime @map("expires_at")
+
+  @@map("tmdb_tv_cache")
+  @@index([tmdbId])
+  @@index([expiresAt])
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum MediaType {
+  movie
+  tv
+}

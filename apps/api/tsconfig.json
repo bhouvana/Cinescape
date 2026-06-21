@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@watchblitz/types": ["../../packages/types/src"],
+      "@watchblitz/config": ["../../packages/config/src"],
+      "@watchblitz/utils": ["../../packages/utils/src"],
+      "@watchblitz/database": ["../../packages/database/src"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}
