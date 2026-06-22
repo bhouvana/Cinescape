@@ -47,7 +47,7 @@ export default function MoviesPage() {
     }
   }, [activeTab, selectedGenreId, minRating, year])
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: ['discover-movies', activeTab, selectedGenreId, minRating, year, page],
     queryFn: () => moviesApi.discover({ ...buildParams(), page }),
     placeholderData: (prev) => prev,
@@ -231,6 +231,23 @@ export default function MoviesPage() {
         <div className={cn('transition-opacity duration-200', isFetching && !isLoading && 'opacity-60')}>
           {isLoading ? (
             <MediaGridSkeleton count={20} />
+          ) : isError ? (
+            <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+              <div className="text-4xl">📡</div>
+              <p className="text-white/50 text-sm">Couldn&apos;t connect to the server. Please try again.</p>
+              <button
+                onClick={() => refetch()}
+                className="px-5 py-2 bg-primary text-black rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : movies.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
+              <div className="text-4xl">📭</div>
+              <p className="text-white/50 text-sm">No movies found for these filters.</p>
+              <button onClick={clearAll} className="text-primary text-sm hover:underline">Clear filters</button>
+            </div>
           ) : (
             <motion.div
               layout
