@@ -12,7 +12,7 @@
 **A premium movie and TV discovery platform built with a modern full-stack monorepo.**  
 Discover what to watch next — powered by TMDB, AI-enhanced search, and a sleek cinematic UI.
 
-[Live Demo](#) · [Report Bug](https://github.com/bhouvana/Cinescape/issues) · [Request Feature](https://github.com/bhouvana/Cinescape/issues)
+[🌐 Live Website](https://cinescape-web.onrender.com) · [Report Bug](https://github.com/bhouvana/Cinescape/issues) · [Request Feature](https://github.com/bhouvana/Cinescape/issues)
 
 </div>
 
