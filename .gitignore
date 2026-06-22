@@ -50,6 +50,9 @@ test-results
 .DS_Store
 Thumbs.db
 
+# Lock file — let Render resolve dependencies fresh
+package-lock.json
+
 # Misc
 *.tsbuildinfo
 .cache
