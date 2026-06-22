@@ -8,6 +8,8 @@ import { buildBackdropUrl, buildPosterUrl, buildProfileUrl, formatRuntime, forma
 import { MediaRow } from '../../../../components/media/media-row'
 import { WatchlistButton } from '../../../../components/media/watchlist-button'
 
+export const revalidate = 3600 // cache each movie page for 1 hour
+
 interface PageProps {
   params: Promise<{ id: string }>
 }

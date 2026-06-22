@@ -48,8 +48,8 @@ export const TMDB_CONFIG = {
   },
   RATE_LIMIT: {
     MAX_REQUESTS_PER_SECOND: 40,
-    RETRY_ATTEMPTS: 3,
-    RETRY_DELAY_MS: 1000,
+    RETRY_ATTEMPTS: 2,
+    RETRY_DELAY_MS: 500,
   },
   ENDPOINTS: {
     // Trending

@@ -3,9 +3,16 @@ import { logger } from './logger'
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined }
 
+// Cap connections to 5 so 100 concurrent users don't exhaust free-tier Postgres (25 max)
+const dbUrl = process.env['DATABASE_URL']
+const pooledUrl = dbUrl
+  ? `${dbUrl}${dbUrl.includes('?') ? '&' : '?'}connection_limit=5&pool_timeout=20`
+  : dbUrl
+
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
+    datasources: { db: { url: pooledUrl } },
     log: process.env['NODE_ENV'] === 'development'
       ? [{ emit: 'event', level: 'query' }, { emit: 'stdout', level: 'error' }]
       : [{ emit: 'stdout', level: 'error' }],

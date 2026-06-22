@@ -9,6 +9,8 @@ import { MediaRow } from '../../../../components/media/media-row'
 import { TVSeasonAccordion } from '../../../../components/media/tv-season-accordion'
 import { WatchlistButton } from '../../../../components/media/watchlist-button'
 
+export const revalidate = 3600 // cache each TV page for 1 hour
+
 interface PageProps {
   params: Promise<{ id: string }>
 }
