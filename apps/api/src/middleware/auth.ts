@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import { createClerkClient } from '@clerk/backend'
+import { createClerkClient, verifyToken } from '@clerk/backend'
 import { prisma } from '../lib/prisma'
 import { logger } from '../lib/logger'
 
@@ -25,7 +25,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     }
 
     const token = authHeader.slice(7)
-    const payload = await clerk.verifyToken(token)
+    const payload = await verifyToken(token, { secretKey: process.env['CLERK_SECRET_KEY'] ?? '' })
 
     if (!payload?.sub) {
       res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Invalid token' } })

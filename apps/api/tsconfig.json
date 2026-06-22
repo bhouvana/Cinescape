@@ -5,7 +5,8 @@
     "moduleResolution": "node",
     "ignoreDeprecations": "6.0",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "../../",
+    "exactOptionalPropertyTypes": false,
     "paths": {
       "@watchblitz/types": ["../../packages/types/src"],
       "@watchblitz/config": ["../../packages/config/src"],
@@ -13,6 +14,6 @@
       "@watchblitz/database": ["../../packages/database/src"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../../packages/types/src/**/*", "../../packages/config/src/**/*", "../../packages/utils/src/**/*", "../../packages/database/src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
