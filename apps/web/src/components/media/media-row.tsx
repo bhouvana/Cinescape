@@ -9,6 +9,7 @@ import { MediaCardSkeleton } from '../skeletons/media-card-skeleton'
 import type { TMDBMovie, TMDBTVShow } from '@watchblitz/types'
 
 type MediaItem = TMDBMovie | TMDBTVShow
+type SafeMediaItem = (TMDBMovie | TMDBTVShow) & { media_type?: 'movie' | 'tv' }
 
 interface MediaRowProps {
   title: string
@@ -89,7 +90,7 @@ export function MediaRow({
             : items.map((item) => (
                 <MediaCard
                   key={item.id}
-                  item={item}
+                  item={item as SafeMediaItem}
                   mediaType={mediaType ?? (('title' in item) ? 'movie' : 'tv')}
                   size={cardSize}
                 />
