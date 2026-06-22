@@ -74,7 +74,7 @@ services:
     plan: free
     rootDir: .
     buildCommand: npm install --include=dev && npx turbo build --filter=@watchblitz/web
-    startCommand: cd apps/web && node_modules/.bin/next start -p 10000
+    startCommand: cd apps/web && ../../node_modules/.bin/next start -p 10000
     envVars:
       - key: NODE_ENV
         value: production
