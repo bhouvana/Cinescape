@@ -11,6 +11,14 @@ import { aiRouter } from './ai'
 
 const router = Router()
 
+// Cache public read-only endpoints in the browser and CDN for 60s, serve stale for 10min
+router.use(['/movies', '/tv', '/trending', '/search'], (req, res, next) => {
+  if (req.method === 'GET') {
+    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=600')
+  }
+  next()
+})
+
 router.use('/movies', moviesRouter)
 router.use('/tv', tvRouter)
 router.use('/search', searchRouter)

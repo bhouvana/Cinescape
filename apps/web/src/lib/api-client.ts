@@ -27,8 +27,13 @@ async function apiFetch<T>(
     }
   }
 
+  const method = (fetchOptions.method ?? 'GET').toUpperCase()
+  const headers = fetchOptions.headers as Record<string, string> | undefined
+  const isPublicGet = method === 'GET' && !headers?.['Authorization']
+
   const res = await fetch(url.toString(), {
     ...fetchOptions,
+    ...(isPublicGet ? { next: { revalidate: 300 } } : { cache: 'no-store' }),
     headers: {
       'Content-Type': 'application/json',
       ...fetchOptions.headers,
