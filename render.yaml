@@ -21,8 +21,8 @@ services:
     region: oregon
     plan: free
     rootDir: .
-    buildCommand: npm install --include=dev && npx turbo build --filter=@watchblitz/api && cd packages/database && npx prisma migrate deploy
-    startCommand: node apps/api/dist/apps/api/src/index.js
+    buildCommand: npm install --include=dev && cd packages/database && npx prisma generate && npx prisma migrate deploy
+    startCommand: node node_modules/.bin/tsx apps/api/src/index.ts
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
