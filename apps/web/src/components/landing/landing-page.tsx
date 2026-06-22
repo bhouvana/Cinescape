@@ -170,7 +170,7 @@ export function LandingPage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
           >
             <Link
-              href="/sign-up"
+              href="/movies"
               className="flex items-center gap-2 px-8 py-4 rounded-xl text-base font-black bg-primary hover:bg-primary/90 text-white transition-all active:scale-95 shadow-2xl shadow-primary/30"
             >
               <Play className="h-5 w-5 fill-white" />
@@ -273,10 +273,10 @@ export function LandingPage() {
                 and our AI picks the perfect titles — instantly.
               </p>
               <Link
-                href="/sign-up"
+                href="/movies"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-primary text-white hover:bg-primary/90 transition-all"
               >
-                Try it free <ChevronRight className="h-4 w-4" />
+                Start browsing <ChevronRight className="h-4 w-4" />
               </Link>
             </motion.div>
 
@@ -432,10 +432,10 @@ export function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/sign-up"
+              href="/movies"
               className="px-10 py-4 rounded-xl text-lg font-black bg-primary hover:bg-primary/90 text-white transition-all active:scale-95 shadow-2xl shadow-primary/40 w-full sm:w-auto"
             >
-              Get Started — It's Free
+              Start Watching Free
             </Link>
             <Link
               href="/sign-in"
