@@ -7,23 +7,11 @@ const nextConfig: NextConfig = {
     reactCompiler: false,
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'image.tmdb.org',
-        pathname: '/t/p/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'img.clerk.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.clerk.dev',
-      },
-    ],
-    formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 86400,
+    // Skip Next.js image optimization — TMDB and Clerk both serve from their
+    // own fast global CDNs with already-sized images. On Render free tier,
+    // the AVIF/WebP conversion pipeline adds 10-15s of CPU overhead per new
+    // page with 20+ posters, far worse than serving originals directly.
+    unoptimized: true,
   },
   headers: async () => [
     {
