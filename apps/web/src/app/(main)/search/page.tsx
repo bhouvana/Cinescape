@@ -11,6 +11,8 @@ import { MediaGridSkeleton } from '../../../components/skeletons/media-card-skel
 import { searchApi, aiApi } from '../../../lib/api-client'
 import { useDebounce } from '../../../hooks/use-debounce'
 import type { TMDBMovie, TMDBTVShow } from '@watchblitz/types'
+
+type SafeSearchItem = (TMDBMovie | TMDBTVShow) & { media_type?: 'movie' | 'tv' }
 import type { AIDiscoverResult } from '../../../lib/api-client'
 
 type FilterType = 'multi' | 'movie' | 'tv'
@@ -45,7 +47,7 @@ function AIResultsPanel({ result }: { result: AIDiscoverResult }) {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: Math.min(i, 10) * 0.04 }}
             >
-              <MediaCard item={item as (TMDBMovie | TMDBTVShow)} mediaType={mediaType} size="lg" />
+              <MediaCard item={item as SafeSearchItem} mediaType={mediaType} size="lg" />
             </motion.div>
           )
         })}
@@ -312,7 +314,7 @@ function SearchContent() {
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ duration: 0.2, delay: Math.min(i % 20, 10) * 0.03 }}
                         >
-                          <MediaCard item={result as (TMDBMovie | TMDBTVShow)} mediaType={mediaType} size="lg" />
+                          <MediaCard item={result as SafeSearchItem} mediaType={mediaType} size="lg" />
                         </motion.div>
                       )
                     })}
