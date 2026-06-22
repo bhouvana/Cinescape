@@ -35,7 +35,7 @@ export function MediaCard({
   const [hovered, setHovered] = useState(false)
   const { isSignedIn, isInWatchlist, toggle } = useWatchlist()
 
-  const resolvedType = mediaType ?? (item.media_type === 'movie' ? 'movie' : 'tv') ?? 'movie'
+  const resolvedType = mediaType ?? (item.media_type === 'movie' ? 'movie' : 'tv')
   const inList = isInWatchlist(item.id, resolvedType)
   const title = 'title' in item ? item.title : item.name
   const date = 'release_date' in item ? item.release_date : item.first_air_date
